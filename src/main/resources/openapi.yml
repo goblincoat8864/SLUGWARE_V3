@@ -1,0 +1,688 @@
+openapi: 3.0.3
+info:
+  title: Boxing Gym App API
+  description: The API for the boxing gym application.
+  version: 0.0.1
+
+paths:
+  /gymOwners/login:
+    post:
+      description: tells if the gym owner is legitimate
+      operationId: gymOwnerLogin
+      requestBody:
+        description: email and password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymOwnerLogInRequestDTO'
+      responses:
+        '200':
+          description: gym owner authenticated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthentificationTokenDTO'
+  /gymOwners/signup:
+    post:
+      description: sign up the gym owner
+      operationId: GymOwnerSignup
+      requestBody:
+        description: name and email and password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymOwnerSignUpRequestDTO'
+      responses:
+        '201':
+          description: gym owner created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymOwnerDTO'
+  /gymOwners/me:
+    get:
+      description: get the connected gym owner
+      operationId: getCurrentGymOwner
+      responses:
+        '200':
+          description: current gym owner returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymOwnerDTO'
+  /gymOwners/verifyToken:
+    post:
+      description: verify the token of the gym owner
+      operationId: verifyToken
+      requestBody:
+        description: token
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: token success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthentificationTokenDTO'
+  /gymOwners/verifyPassword:
+    post:
+      description: verify the password of the gym owner
+      operationId: verifyPassword
+      requestBody:
+        description: password
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: verification success
+  /gymOwners/logo:
+    get:
+      description: get the logo of connected gym owner
+      operationId: getLogoCurrentGymOwner
+      responses:
+        '200':
+          description: current gym owner returned successfully
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /gymOwners/logo/{id}:
+    post:
+      description: set the logo of gym owner
+      operationId: setLogoCurrentGymOwner
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the gym owner
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                logo:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: current gym owner logo changed successfully
+  /gymOwners/gymMembers/picture/{id}:
+    post:
+      description: set the logo of the gym member
+      operationId: setPictureGymMember
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the gym member
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                picture:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: current gym owner logo changed successfully
+  /gymOwners/gymMembers/balance/{id}:
+    post:
+      description: set the balance of the gym member
+      operationId: updateBalance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the gym member
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: number
+              format: double
+      responses:
+        '200':
+          description: current gym member balance updated successfully
+  /gymOwners/gymMembers:
+    get:
+      description: returns the list of the gym members by username
+      operationId: getAllGymMembers
+      parameters:
+        - name: query
+          in: query
+          description: Search query for gym members
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: list of the gym members returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymMemberDTOs'
+  /gymOwners/filteredGymMembers:
+    get:
+      summary: Get filtered members
+      operationId: getFilteredGymMembers
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Filter by member name
+        - name: paid
+          in: query
+          schema:
+            type: boolean
+          description: Filter by paid status
+        - name: weightMin
+          in: query
+          schema:
+            type: number
+            format: double
+          description: Minimum weight filter
+        - name: weightMax
+          in: query
+          schema:
+            type: number
+            format: double
+          description: Maximum weight filter
+        - name: paymentPlanName
+          in: query
+          schema:
+            type: string
+          description: Filter by payment plan name
+        - name: attendenceDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter by attendence date
+      responses:
+        '200':
+          description: List of filtered members
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymMemberDTOs'
+  /gymOwners/gymMembers/{id}:
+    put:
+      summary: Update a gym member
+      operationId: updateGymMember
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the gym member to update
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymMemberSignUpRequestDTO'
+      responses:
+        '200':
+          description: Gym member updated successfully
+    delete:
+      summary: Delete a gym member
+      operationId: deleteGymMember
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the gym member to delete
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Gym member deleted successfully
+  /gymOwners/{id}/uploadFile:
+    post:
+      tags:
+        - gymMembers
+      summary: Upload PDF file for a GymMember
+      operationId: uploadFile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymMemberFileDTO'
+  /gymOwners/{id}/pdfs:
+    get:
+      tags:
+        - gymMembers
+      summary: Get all PDF files for a GymMember
+      operationId: getAllFiles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of PDF files
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GymMemberFileDTOs'
+  /gymOwners/files/{id}:
+    get:
+      tags:
+        - gymMembers
+      summary: Get a file from its id
+      operationId: getFile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: the pdf file
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /gymOwners/paymentPlans:
+    get:
+      summary: Retrieve payment plans for the connected GymOwner
+      operationId: getAllPaymentPlans
+      responses:
+        '200':
+          description: List of payment plans
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPlanDTOs'
+  /gymMembers/login:
+    post:
+      description: tells if the gym member is legitimate
+      operationId: gymMemberLogin
+      requestBody:
+        description: username and pin
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymMemberLogInRequestDTO'
+      responses:
+        '200':
+          description: gym member authenticated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthentificationTokenDTO'
+  /gymMembers/signup:
+    post:
+      description: sign up the gym member
+      operationId: GymMemberSignup
+      requestBody:
+        description: name and username and pin
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymMemberSignUpRequestDTO'
+      responses:
+        '201':
+          description: gym member created successfully
+  /gymMembers/me:
+    get:
+      description: get the connected gym member
+      operationId: getCurrentGymMember
+      responses:
+        '200':
+          description: current gym member returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymMemberDTO'
+  /gymMembers/{id}:
+    get:
+      description: get gym member by id
+      operationId: getGymMemberById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: gym member returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymMemberDTO'
+  /gymRecords:
+    post:
+      summary: Save a record
+      operationId: saveRecord
+      responses:
+        '201':
+          description: Record saved successfully
+    get:
+      summary: Get Gym Records for the connected gym owner
+      operationId: getRecordsForConnectedGymOwner
+      responses:
+        "200":
+          description: List of gym records for the connected gym owner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GymRecordDTOs"
+  /payments/gymMembers/create-payment-intent:
+    post:
+      summary: Create a Payment Intent for gym memberr
+      description: Creates a Stripe payment intent for processing a payment.
+      operationId: createPaymentIntent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: number
+              format: double
+      responses:
+        "200":
+          description: Payment intent successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+  /payments/gymOwners/{id}/create-subscription:
+    post:
+      summary: Create a subscription
+      description: Creates a subscription.
+      operationId: createSubscription
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Payment subscription successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+
+  /payments/gymOwners/{id}/create-stripe-account:
+    post:
+      summary: Create a stripe account
+      description: Creates a Stripe payment account for gym owner.
+      operationId: createStripeAccount
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Payment stripe account successfully created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+
+  /payments/gymOwners/webhook:
+    post:
+      summary: Handle Stripe Webhook
+      description: Listens for webhook events from Stripe and processes them accordingly.
+      operationId: handleWebhook
+      requestBody:
+        description: Stripe webhook payload
+        required: false
+        content:
+          application/json;charset=utf-8:
+            schema:
+              type: string
+      parameters:
+        - name: Stripe-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Webhook processed successfully.
+
+components:
+  schemas:
+    GymOwnerLogInRequestDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    GymOwnerSignUpRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        gymAddress:
+          type: string
+        phoneNumber:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        paymentPlans:
+          $ref: '#/components/schemas/PaymentPlanDTOs'
+
+    AuthentificationTokenDTO:
+      type: object
+      properties:
+        token:
+          type: string
+        expirationTimeMillis:
+          type: integer
+          format: int64
+
+    GymOwnerDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        name:
+          type: string
+        paymentPlans:
+          $ref: '#/components/schemas/PaymentPlanDTOs'
+          
+    GymMemberSignUpRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        username:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        phoneNumber:
+          type: string
+        emergencyPhoneNumber:
+          type: string
+        weight:
+          type: number
+          format: double
+        pin:
+          type: string
+#          pattern: "^[0-9]{4}$"
+          description: "A 4-digit PIN."
+        paymentPlan:
+          $ref: '#/components/schemas/PaymentPlanDTO'
+    
+    GymMemberLogInRequestDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        pin:
+          type: string
+          pattern: "^[0-9]{4}$"
+          description: "A 4-digit PIN."
+    
+    GymMemberResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        username:
+          type: string
+        gymOwnerId:
+          type: integer
+          format: int64
+
+    GymRecordDTOs:
+      type: array
+      items:
+        $ref: '#/components/schemas/GymRecordDTO'
+
+    PaymentPlanDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: number
+          format: double
+        frequencyInDays:
+          type: integer
+
+    PaymentPlanDTOs:
+      type: array
+      items:
+        $ref: '#/components/schemas/PaymentPlanDTO'
+
+    GymRecordDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        dateTime:
+          type: string
+          format: date-time
+        gymMember:
+          $ref: "#/components/schemas/GymMemberDTO"
+
+    GymMemberFileDTOs:
+      type: array
+      items:
+        $ref: '#/components/schemas/GymMemberFileDTO'
+
+    GymMemberFileDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    GymMemberDTOs:
+      type: array
+      items:
+        $ref: '#/components/schemas/GymMemberDTO'
+
+    GymMemberDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        username:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        phoneNumber:
+          type: string
+        emergencyPhoneNumber:
+          type: string
+        weight:
+          type: number
+          format: double
+        pin:
+          type: string
+          pattern: "^[0-9]{4}$"
+          description: "A 4-digit PIN."
+        paymentPlan:
+          $ref: '#/components/schemas/PaymentPlanDTO'
+        pdfs:
+          $ref: '#/components/schemas/GymMemberFileDTOs'
+        picture:
+          type: string
+          description: Picture of the gym member, encoded in base64
+        balance:
+          type: number
+          format: double
+
+    PaymentResponse:
+      type: object
+      properties:
+        clientSecret:
+          type: string
+        ephemeralKey:
+          type: string
+        customerId:
+          type: string

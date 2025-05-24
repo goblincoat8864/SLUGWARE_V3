@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="1" author="issam">
+        <createTable tableName="gym-owners">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gym-address" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone-number" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="issam">
+        <createTable tableName="gym-members">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pin" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gym-owner-id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="date-of-birth" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone-number" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="emergency-phone-number" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weight" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="paid" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="signup-date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment-plan-id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="gym-members"
+                baseColumnNames="gym-owner-id"
+                referencedTableName="gym-owners"
+                referencedColumnNames="id"
+                constraintName="fk_gym_owners_members" />
+    </changeSet>
+
+    <changeSet id="3" author="issam">
+        <createTable tableName="gym-records">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="gym-member-id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gym-owner-id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recorded-at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+                baseTableName="gym-records"
+                baseColumnNames="gym-owner-id"
+                referencedTableName="gym-owners"
+                referencedColumnNames="id"
+                constraintName="fk_gym_records_owners" />
+        <addForeignKeyConstraint
+                baseTableName="gym-records"
+                baseColumnNames="gym-member-id"
+                referencedTableName="gym-members"
+                referencedColumnNames="id"
+                constraintName="fk_gym_records_members" />
+    </changeSet>
+
+    <changeSet id="4" author="issam">
+        <createTable tableName="payment-plans">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="frequency-in-days" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gym-owner-id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="payment-plans"
+                baseColumnNames="gym-owner-id"
+                referencedTableName="gym-owners"
+                referencedColumnNames="id"
+                constraintName="fk_payment_plan_gym_owner"/>
+        <addForeignKeyConstraint
+                baseTableName="gym-members"
+                baseColumnNames="payment-plan-id"
+                referencedTableName="payment-plans"
+                referencedColumnNames="id"
+                constraintName="fk_payment_plan_gym_member"/>
+    </changeSet>
+
+    <changeSet id="5" author="issam">
+        <createTable tableName="gym-members-files">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gym-member-id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="gym-members-files"
+                baseColumnNames="gym-member-id"
+                referencedTableName="gym-members"
+                referencedColumnNames="id"
+                constraintName="fk-gym-member-file"/>
+    </changeSet>
+
+    <changeSet id="6" author="issam">
+        <addColumn tableName="gym-owners">
+            <column name="logo" type="bytea"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="7" author="issam">
+        <addColumn tableName="gym-members">
+            <column name="picture" type="bytea"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="8" author="issam">
+        <addColumn tableName="gym-members">
+            <column name="balance" type="int"/>
+            <column name="next-payment-date" type="date"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="9" author="issam">
+        <modifyDataType tableName="gym-members" columnName="balance" newDataType="double"/>
+    </changeSet>
+
+    <changeSet id="10" author="issam">
+        <addColumn tableName="gym-owners">
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="paid" type="boolean" defaultValueBoolean="false"/>
+            <column name="paid-until" type="date"/>
+            <column name="stripe-customer-id" type="VARCHAR(255)"/>
+            <column name="payment-method-id" type="VARCHAR(255)"/>
+            <column name="subscription-id" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="11" author="issam">
+        <addColumn tableName="gym-owners">
+            <column name="stripe-account-id" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="12" author="issam">
+        <addColumn tableName="gym-members-files">
+            <column name="content" type="BLOB"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="13" author="issam">
+        <addColumn tableName="gym-members">
+            <column name="stripe-customer-id" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
