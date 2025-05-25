@@ -31,10 +31,10 @@ public class StripeServiceImpl implements StripeService {
 
     private static final Logger logger = LoggerFactory.getLogger(StripeServiceImpl.class);
 
-    @Value("${stripe.api.secret.key}")
+    @Value("${stripe.api.key}")
     private String secretKey;
 
-    @Value("${stripe.webhook.secret}")
+    @Value("${stripe.webhook.key}")
     private String webhookKey;
 
     private final GymOwnerRepository gymOwnerRepository;

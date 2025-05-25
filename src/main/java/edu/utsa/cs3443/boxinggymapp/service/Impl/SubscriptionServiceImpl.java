@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
 
-    @Value("${stripe.api.secret.key}")
+    @Value("${stripe.api.key}")
     private String secretKey;
 
     @Override
